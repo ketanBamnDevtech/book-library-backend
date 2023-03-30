@@ -3,6 +3,7 @@ import checkIsLoggedIn from "../middleware/checkIsLoggedIn.js";
 
 const getMe = async (_, args, { req, getAuthUser }) => {
   try {
+    console.log("signup");
     await checkIsLoggedIn(req, getAuthUser);
 
     const user = await getAuthUser(req);

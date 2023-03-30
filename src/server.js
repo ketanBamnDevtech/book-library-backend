@@ -9,6 +9,7 @@ import app from "./app.js";
 import { Mutation, Query } from "./resolvers/index.js";
 import DateTime from "./resolvers/datetime.js";
 import getAuthUser from "./middleware/authUser.js";
+import { graphqlUploadExpress } from "graphql-upload";
 
 const httpServer = http.createServer(app);
 
@@ -18,6 +19,9 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+// This middleware should be added before calling `applyMiddleware`.
+app.use(graphqlUploadExpress());
 
 const resolvers = {
   DateTime,

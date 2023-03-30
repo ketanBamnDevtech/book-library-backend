@@ -5,5 +5,7 @@ export default {
   // Auth
   signupUser: authController.signup,
   loginUser: authController.login,
-  addNewBook: bookController.addBook,
+  addBook: bookController.addBook,
+  modifyBook: bookController.modifyBook,
+  addRating: bookController.addRating,
 };

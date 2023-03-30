@@ -18,9 +18,10 @@ const bookSchema = new mongoose.Schema(
       type: String,
       default: "default.png",
     },
-    collections: {
+    collect: {
       type: String,
-      enum: ["want to read", "reading", "read"],
+      enum: ["WANT_TO_READ", "READING", "READ"],
+      default: "WANT_TO_READ",
     },
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
