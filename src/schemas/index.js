@@ -72,6 +72,16 @@ const typeDefs = gql`
     ): NewBookResponse!
     addToLibrary(input: AddToLibraryInput!): AddToLibraryResponse!
     addRating(input: RatingInput!): RatingResponse!
+    myBooks(input: MyBookInput!): MyBookResponse!
+  }
+
+  input MyBookInput {
+    userId: String!
+  }
+
+  type MyBookResponse {
+    status: String!
+    myLibrary: [myLibrary]
   }
 
   input AddToLibraryInput {

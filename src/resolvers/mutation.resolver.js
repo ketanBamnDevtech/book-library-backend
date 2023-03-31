@@ -8,4 +8,5 @@ export default {
   addBook: bookController.addBook,
   addToLibrary: bookController.addToLibrary,
   addRating: bookController.addRating,
+  myBooks: bookController.myBooks,
 };

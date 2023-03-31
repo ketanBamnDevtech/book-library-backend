@@ -154,9 +154,28 @@ const addRating = async (parent, args, context) => {
   }
 };
 
+const myBooks = async (parent, args, context) => {
+  const { userId } = args.input;
+
+  try {
+    const myLibrary = await myLibraryModel
+      .find({ userId: new mongoose.Types.ObjectId(userId) })
+      .populate("userId")
+      .populate("bookId");
+    console.log(myLibrary);
+    return {
+      status: "success",
+      myLibrary,
+    };
+  } catch (error) {
+    errorHandler(error);
+  }
+};
+
 export default {
   addBook,
   allBooks,
   addToLibrary,
   addRating,
+  myBooks,
 };
