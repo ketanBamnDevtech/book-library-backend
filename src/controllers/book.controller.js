@@ -1,5 +1,7 @@
 import bookModel from "../models/book.model.js";
-import ratingModel from "../models/rating.model.js";
+import myLibraryModel from "../models/myLibrary.model.js";
+
+// import ratingModel from "../models/rating.model.js";
 import errorHandler from "./error.controller.js";
 import { createWriteStream } from "fs";
 import mongoose from "mongoose";
@@ -10,7 +12,7 @@ import checkIsLoggedIn from "../middleware/checkIsLoggedIn.js";
 
 const addBook = async (parent, args, context) => {
   console.log("add book");
-  const { title, author, date, collect, coverImage } = args;
+  const { title, author, date, coverImage } = args;
   const { file } = await coverImage;
   const { createReadStream, filename, mimetype } = file;
 
@@ -29,7 +31,6 @@ const addBook = async (parent, args, context) => {
       author,
       date: new Date(date),
       coverImage: newFilename,
-      collect,
     });
     return {
       status: "success",
@@ -46,12 +47,20 @@ const addBook = async (parent, args, context) => {
 const allBooks = async (parent, args, context) => {
   const { collection, sortBy, filterByTitle, filterByDate } = args;
 
-  const books = await bookModel.find();
+  const books = await bookModel.find().populate({
+    path: "reviews",
+    populate: {
+      path: "userId",
+    },
+  });
 
   let filteredBooks = books;
   if (collection) {
-    filteredBooks = filteredBooks.filter((book) => book.collect === collection);
+    filteredBooks = filteredBooks.filter((book) =>
+      book.reviews.some((review) => review.collect === collection)
+    );
   }
+
   if (filterByTitle) {
     filteredBooks = filteredBooks.filter((book) =>
       book.title.toLowerCase().includes(filterByTitle.toLowerCase())
@@ -79,23 +88,46 @@ const allBooks = async (parent, args, context) => {
     }
   }
 
+  filteredBooks = calculateBookRatings(filteredBooks);
   return { status: "success", books: filteredBooks };
 };
 
-const modifyBook = async (parent, args, context) => {
-  const { id, collect } = args.input;
+function calculateBookRatings(books) {
+  for (let i = 0; i < books.length; i++) {
+    let book = books[i];
+    let sumOfRatings = 0;
+
+    for (let j = 0; j < book.reviews.length; j++) {
+      sumOfRatings += book.reviews[j].rating;
+    }
+    let averageRating = sumOfRatings / book.reviews.length;
+    book.avgRating = averageRating;
+  }
+
+  return books;
+}
+
+const addToLibrary = async (parent, args, context) => {
+  const { bookId, userId, collect, rating } = args.input;
 
   try {
-    const update = {
-      collect,
-    };
-    const book = await bookModel.findOneAndUpdate({ _id: id }, update, {
-      returnNewDocument: true,
-    });
-    console.log(book);
+    const addLibrary = await myLibraryModel.findOneAndUpdate(
+      {
+        userId: new mongoose.Types.ObjectId(userId),
+        bookId: new mongoose.Types.ObjectId(bookId),
+      },
+      { $set: { collect, rating } },
+      { upsert: true, new: true }
+    );
+
+    const myLibrary = await myLibraryModel
+      .findOne({ _id: addLibrary._id })
+      .populate("userId")
+      .populate("bookId");
+
     return {
       status: "success",
-      book,
+      myLibrary,
     };
   } catch (error) {
     if (error.code === 11000) {
@@ -115,8 +147,8 @@ const addRating = async (parent, args, context) => {
       rating: Number(rating),
     };
 
-    const rate = await ratingModel.create(data);
-    return { status: "success", rating: rate };
+    // const rate = await ratingModel.create(data);
+    // return { status: "success", rating: rate };
   } catch (error) {
     errorHandler(error);
   }
@@ -125,6 +157,6 @@ const addRating = async (parent, args, context) => {
 export default {
   addBook,
   allBooks,
-  modifyBook,
+  addToLibrary,
   addRating,
 };

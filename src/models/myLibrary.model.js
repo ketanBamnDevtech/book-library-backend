@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const ratingSchema = new mongoose.Schema(
+const myLibrarySchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.ObjectId,
@@ -12,6 +12,11 @@ const ratingSchema = new mongoose.Schema(
       ref: "Book",
       required: [true, "Review must have book"],
     },
+    collect: {
+      type: String,
+      enum: ["WANT_TO_READ", "READING", "READ"],
+      default: "WANT_TO_READ",
+    },
     rating: {
       type: Number,
       enum: [1, 2, 3, 4, 5, 0],
@@ -21,5 +26,5 @@ const ratingSchema = new mongoose.Schema(
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-const ratingModel = mongoose.model("Rating", ratingSchema);
-export default ratingModel;
+const myLibraryModel = mongoose.model("MyLibrary", myLibrarySchema);
+export default myLibraryModel;

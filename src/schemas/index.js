@@ -29,16 +29,27 @@ const typeDefs = gql`
 
   type AllBookResponse {
     status: String!
-    books: [Book!]
+    books: [AllBook!]
+  }
+
+  type AllBook {
+    id: ID!
+    title: String!
+    author: String
+    date: DateTime
+    avgRating: Int!
+    reviews: [myLibrary]
+    coverImage: String
+    createdAt: DateTime
+    updatedAt: DateTime
   }
 
   type Book {
     id: ID!
     title: String!
-    author: String!
-    date: DateTime!
+    author: String
+    date: DateTime
     coverImage: String
-    collect: String!
     createdAt: DateTime
     updatedAt: DateTime
   }
@@ -57,16 +68,30 @@ const typeDefs = gql`
       title: String!
       author: String!
       date: String!
-      collect: String!
       coverImage: Upload
     ): NewBookResponse!
-    modifyBook(input: ModifyBookInput!): NewBookResponse!
+    addToLibrary(input: AddToLibraryInput!): AddToLibraryResponse!
     addRating(input: RatingInput!): RatingResponse!
   }
 
-  input ModifyBookInput {
-    id: String!
+  input AddToLibraryInput {
+    bookId: String!
+    userId: String!
     collect: String!
+    rating: Int!
+  }
+
+  type AddToLibraryResponse {
+    status: String!
+    myLibrary: myLibrary!
+  }
+
+  type myLibrary {
+    id: ID!
+    rating: Int!
+    collect: String!
+    bookId: Book!
+    userId: UserData!
   }
 
   input SignUpInput {
@@ -133,7 +158,6 @@ const typeDefs = gql`
     author: String!
     date: String!
     coverImage: String!
-    collect: String!
     createdAt: DateTime
     updatedAt: DateTime
   }

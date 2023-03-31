@@ -18,16 +18,23 @@ const bookSchema = new mongoose.Schema(
       type: String,
       default: "default.png",
     },
-    collect: {
-      type: String,
-      enum: ["WANT_TO_READ", "READING", "READ"],
-      default: "WANT_TO_READ",
+    avgRating: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
 bookSchema.index({ title: 1 });
+
+bookSchema.virtual("reviews", {
+  ref: "MyLibrary",
+  foreignField: "bookId",
+  localField: "_id",
+  select: true,
+  populate: "userId",
+});
 
 const bookModel = mongoose.model("Book", bookSchema);
 export default bookModel;

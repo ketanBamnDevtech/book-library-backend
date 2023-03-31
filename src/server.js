@@ -47,7 +47,6 @@ const resolvers = {
   server.applyMiddleware({ app, cors: corsOptions });
 
   const port = config.get("port");
-  console.log(port, ">>>>>>>>>>>>>>>>>>>>>>>");
 
   await new Promise((resolve) => httpServer.listen(port, "0.0.0.0", resolve));
   console.log(
